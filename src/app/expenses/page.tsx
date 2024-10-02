@@ -4,8 +4,6 @@ import { PieChart, Pie, ResponsiveContainer } from "recharts";
 import { useMemo, useState } from "react";
 
 const Expenses = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState("All");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -19,32 +17,34 @@ const Expenses = () => {
     { category: "Housing", amount: 350 },
   ];
 
-  const expenses = useMemo(() => expensesData, []);
+  const expenses = useMemo(() => expensesData, [expensesData]);
 
-// Aggregate the data
-const aggregateData = useMemo(() => {
+  // Aggregate the data
+  const aggregateData = useMemo(() => {
     if (!expenses) return [];
-  
-    // Define the type for aggregatedData
-    const aggregatedData: Record<string, number> = expenses.reduce((acc: Record<string, number>, expense) => {
-      const category = expense.category;
-      if (!acc[category]) {
-        acc[category] = 0;
-      }
-      acc[category] += expense.amount;
-      return acc;
-    }, {});
-  
+
+    const aggregatedData: Record<string, number> = expenses.reduce(
+      (acc: Record<string, number>, expense) => {
+        const category = expense.category;
+        if (!acc[category]) {
+          acc[category] = 0;
+        }
+        acc[category] += expense.amount;
+        return acc;
+      },
+      {}
+    );
+
     return Object.keys(aggregatedData).map((category) => ({
       name: category,
       value: aggregatedData[category],
     }));
   }, [expenses]);
-  
 
   const classNames = {
     label: "block text-sm font-medium text-gray-700",
-    selectInput: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:ring-indigo-500 sm:text-sm rounded-md",
+    selectInput:
+      "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:ring-indigo-500 sm:text-sm rounded-md",
   };
 
   return (
@@ -52,7 +52,9 @@ const aggregateData = useMemo(() => {
       {/* Header */}
       <div className="mb-5">
         <h1>Expenses</h1>
-        <p className="text-sm text-gray-500">A virtual representation of expenses over time</p>
+        <p className="text-sm text-gray-500">
+          A virtual representation of expenses over time
+        </p>
       </div>
 
       {/* Filters */}
@@ -69,7 +71,6 @@ const aggregateData = useMemo(() => {
                 name="category"
                 className={classNames.selectInput}
                 defaultValue="All"
-                onChange={(e) => setSelectedCategory(e.target.value)}
               >
                 <option value="All">All</option>
                 <option value="Food">Food</option>
@@ -114,17 +115,15 @@ const aggregateData = useMemo(() => {
         <div className="flex-grow bg-white shadow rounded-lg p-4 md:p-6">
           <ResponsiveContainer width="100%" height={400}>
             <PieChart>
-            <Pie
-  data={aggregateData}
-  dataKey="value" // Specify the dataKey here
-  cx="50%"
-  cy="50%"
-  label
-  outerRadius={150}
-  fill="#8884d8"
-  onMouseEnter={(event, index) => setActiveIndex(index)}
-/>
-
+              <Pie
+                data={aggregateData}
+                dataKey="value"
+                cx="50%"
+                cy="50%"
+                label
+                outerRadius={150}
+                fill="#8884d8"
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
