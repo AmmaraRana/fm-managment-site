@@ -23,16 +23,19 @@ import {
 import { PersistGate } from "redux-persist/integration/react";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 
-/* REDUX PERSISTENCE */
+// Define a type for the storage item keys
+type StorageKey = string;
+
+// Redux persistence
 const createNoopStorage = () => {
   return {
-    getItem(_key: any) {
+    getItem(_key: StorageKey) {
       return Promise.resolve(null);
     },
-    setItem(_key: any, value: any) {
+    setItem(_key: StorageKey, value: string) {
       return Promise.resolve(value);
     },
-    removeItem(_key: any) {
+    removeItem(_key: StorageKey) {
       return Promise.resolve();
     },
   };
@@ -46,15 +49,19 @@ const storage =
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["global"],
+  whitelist: ["global"], // Whitelist your global state for persistence
 };
+
+// Combine reducers
 const rootReducer = combineReducers({
   global: globalReducer,
   [api.reducerPath]: api.reducer,
 });
+
+// Create a persisted reducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-/* REDUX STORE */
+// Create Redux store
 export const makeStore = () => {
   return configureStore({
     reducer: persistedReducer,
@@ -67,24 +74,26 @@ export const makeStore = () => {
   });
 };
 
-/* REDUX TYPES */
+// Redux types
 export type AppStore = ReturnType<typeof makeStore>;
 export type RootState = ReturnType<AppStore["getState"]>;
 export type AppDispatch = AppStore["dispatch"];
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-/* PROVIDER */
+// Store provider component
 export default function StoreProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const storeRef = useRef<AppStore>();
+  
   if (!storeRef.current) {
     storeRef.current = makeStore();
     setupListeners(storeRef.current.dispatch);
   }
+
   const persistor = persistStore(storeRef.current);
 
   return (
