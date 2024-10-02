@@ -1,8 +1,7 @@
 "use client";
 import CardPopularProducts from "./CardPopularProducts";
-import CardSalesSummary from "./SalesSummaryChart";
-import CardPurchaseSummary from './CardPurchaseSummary';
 import SalesSummaryChart from "./SalesSummaryChart";
+import CardPurchaseSummary from './CardPurchaseSummary';
 import Card from "./Card"; // Ensure this import points to the correct Card component
 
 const Dashboard = () => {
